@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.CountDownTimer;
 
 /**
  * Created by АНАТОЛИЙ on 15.06.2014.
@@ -50,7 +51,29 @@ public class PlayFragment extends Fragment {
                     case R.id.buttonStart:
                         Toast.makeText(getActivity(), "нажата кнопка Start", Toast.LENGTH_SHORT).show();
                         startTime = SystemClock.uptimeMillis();
-                        customHandler.postDelayed(updateTimerThread, 0);
+                        buttonStart.setEnabled(false);
+                        new CountDownTimer(60000, 100) {  // Первый параметр это время отсчета, 2й частота с которой вызывается метод onTick
+                            public void onTick(long millisUntilFinished) {
+                                //  timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+                                updatedTime = millisUntilFinished;
+                                int secs = (int) (updatedTime / 1000);
+                                Log.d("myapp", "secs =" + secs);
+                                int mins = secs / 60;
+                                Log.d("myapp", "mins =" + mins);
+                                secs = secs % 60;
+                                int milliseconds = (int) (updatedTime % 1000);
+                                timerValue.setText("" + mins + ":"
+                                        + String.format("%02d", secs) + ":"
+                                        + String.format("%03d", milliseconds));
+                            }
+
+                            public void onFinish() { //Этот метод вызовется по завершению работы таймера
+                                buttonStart.setEnabled(true);
+                                currentTeamName.setText(Result.nextTeam());
+                            }
+
+                        }.start();
+
 
                         break;
                     case R.id.buttonSkip:
@@ -70,7 +93,11 @@ public class PlayFragment extends Fragment {
         return view;
     }
 
-    private Runnable updateTimerThread = new Runnable() {
+
+
+
+/*
+private Runnable updateTimerThread = new Runnable() {
 
         public void run() {
 
@@ -99,7 +126,7 @@ public class PlayFragment extends Fragment {
             customHandler.postDelayed(this, 0);
         }
 
-    };
+    };*/
 
 }
 
